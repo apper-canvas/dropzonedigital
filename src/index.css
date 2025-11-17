@@ -1,0 +1,113 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* React Toastify Styles */
+@import 'react-toastify/dist/ReactToastify.css';
+
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Toast Customization */
+.Toastify__toast-container {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.Toastify__toast {
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.Toastify__toast--success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.Toastify__toast--error {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.Toastify__toast--warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.Toastify__toast--info {
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+  color: white;
+}
+
+.Toastify__progress-bar {
+  height: 3px;
+}
+
+/* Drag and Drop Styles */
+.drag-over {
+  border-color: #06b6d4 !important;
+  background-color: rgba(6, 182, 212, 0.05);
+  transform: scale(1.02);
+  transition: all 0.15s ease-out;
+}
+
+.drag-active {
+  border-style: solid !important;
+  border-width: 2px !important;
+}
+
+/* Progress Bar Animation */
+.progress-fill {
+  transition: width 0.3s ease-out;
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+}
+
+/* File Card Hover Effects */
+.file-card {
+  transition: all 0.1s ease-out;
+}
+
+.file-card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Button Hover Effects */
+.btn-hover {
+  transition: all 0.15s ease-out;
+}
+
+.btn-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
