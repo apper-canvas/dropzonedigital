@@ -97,33 +97,7 @@ const handleCancelUpload = useCallback((fileId) => {
       setIsUploading(false);
     }
   }, [files, uploadFile]);
-
-  const totalFiles = files.length;
-const handleUploadAll = useCallback(async () => {
-    const pendingFiles = files.filter(f => f.status_c === "pending");
-    
-    if (pendingFiles.length === 0) {
-      toast.warning("No files to upload");
-      return;
-    }
-
-    setIsUploading(true);
-    
-    try {
-      // Upload files sequentially to avoid overwhelming the system
-      for (const file of pendingFiles) {
-        await uploadFile(file);
-      }
-      
-      toast.success(`Successfully uploaded ${pendingFiles.length} file${pendingFiles.length > 1 ? "s" : ""}!`);
-    } catch (error) {
-      console.error("Batch upload error:", error);
-      toast.error("Some files failed to upload");
-    } finally {
-      setIsUploading(false);
-    }
-  }, [files, uploadFile]);
-
+const totalFiles = files.length;
 const completedFiles = files.filter(f => f.status_c === "success").length;
   const failedFiles = files.filter(f => f.status_c === "error").length;
   const { logout } = useAuth();
@@ -171,13 +145,12 @@ const completedFiles = files.filter(f => f.status_c === "success").length;
             </div>
           </motion.div>
         )}
-
-        {/* Drop Zone */}
+{/* Drop Zone */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-className="mb-8"
+          className="mb-8"
         >
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold text-gray-900">DropZone</h1>
@@ -193,10 +166,10 @@ className="mb-8"
             disabled={isUploading}
           />
         </motion.div>
-
-        {/* File Queue */}
+{/* File Queue */}
         <motion.div
-animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
           <FileQueue
