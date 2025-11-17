@@ -1,4 +1,6 @@
-import uploadFiles from "@/services/mockData/uploadFiles.json";
+import { getApperClient } from "@/services/apperClient";
+
+const TABLE_NAME = 'uploads_c';
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -20,13 +22,114 @@ export const uploadService = {
     }
     
     return {
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      uploadedAt: new Date().toISOString(),
-      url: URL.createObjectURL(file)
+      Id: Date.now(),
+      name_c: file.name,
+      size_c: file.size,
+      type_c: file.type,
+      uploadedAt_c: new Date().toISOString(),
+      url_c: URL.createObjectURL(file)
     };
+  },
+
+  async createUpload(fileData) {
+    try {
+      const apperClient = getApperClient();
+      if (!apperClient) {
+        throw new Error('ApperClient not initialized');
+      }
+
+      const response = await apperClient.createRecord(TABLE_NAME, {
+        records: [{
+          name_c: fileData.name_c,
+          size_c: fileData.size_c,
+          type_c: fileData.type_c,
+          status_c: fileData.status_c,
+          progress_c: fileData.progress_c,
+          preview_c: fileData.preview_c,
+          uploadedAt_c: fileData.uploadedAt_c,
+          url_c: fileData.url_c,
+          errorMessage_c: fileData.errorMessage_c
+        }]
+      });
+
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+
+      if (response.results && response.results.length > 0) {
+        const result = response.results[0];
+        if (result.success) {
+          return result.data;
+        } else {
+          throw new Error(result.message || 'Failed to create upload record');
+        }
+      }
+    } catch (error) {
+      console.error('Error creating upload:', error?.response?.data?.message || error);
+      throw error;
+    }
+  },
+
+  async updateUpload(Id, fileData) {
+    try {
+      const apperClient = getApperClient();
+      if (!apperClient) {
+        throw new Error('ApperClient not initialized');
+      }
+
+      const response = await apperClient.updateRecord(TABLE_NAME, {
+        records: [{
+          Id,
+          name_c: fileData.name_c,
+          size_c: fileData.size_c,
+          type_c: fileData.type_c,
+          status_c: fileData.status_c,
+          progress_c: fileData.progress_c,
+          preview_c: fileData.preview_c,
+          uploadedAt_c: fileData.uploadedAt_c,
+          url_c: fileData.url_c,
+          errorMessage_c: fileData.errorMessage_c
+        }]
+      });
+
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+
+      if (response.results && response.results.length > 0) {
+        const result = response.results[0];
+        if (result.success) {
+          return result.data;
+        } else {
+          throw new Error(result.message || 'Failed to update upload record');
+        }
+      }
+    } catch (error) {
+      console.error('Error updating upload:', error?.response?.data?.message || error);
+      throw error;
+    }
+  },
+
+  async deleteUpload(Id) {
+    try {
+      const apperClient = getApperClient();
+      if (!apperClient) {
+        throw new Error('ApperClient not initialized');
+      }
+
+      const response = await apperClient.deleteRecord(TABLE_NAME, {
+        RecordIds: [Id]
+      });
+
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error deleting upload:', error?.response?.data?.message || error);
+      throw error;
+    }
   },
 
   validateFile(file) {

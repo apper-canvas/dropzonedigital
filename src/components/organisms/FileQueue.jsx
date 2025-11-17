@@ -5,7 +5,7 @@ import Button from "@/components/atoms/Button";
 import ApperIcon from "@/components/ApperIcon";
 
 const FileQueue = ({ files, onRemoveFile, onCancelUpload, onClearAll, onUploadAll }) => {
-  const pendingFiles = files.filter(f => f.status === "pending");
+const pendingFiles = files.filter(f => f.status_c === "pending");
   const uploadingFiles = files.filter(f => f.status === "uploading");
   const completedFiles = files.filter(f => f.status === "success");
   const errorFiles = files.filter(f => f.status === "error");
@@ -98,9 +98,9 @@ const FileQueue = ({ files, onRemoveFile, onCancelUpload, onClearAll, onUploadAl
       {/* File List */}
       <div className="space-y-3 custom-scrollbar max-h-96 overflow-y-auto">
         <AnimatePresence mode="popLayout">
-          {files.map((file) => (
+{files.map((file) => (
             <FileCard
-              key={file.id}
+              key={file.Id}
               file={file}
               onRemove={onRemoveFile}
               onCancel={onCancelUpload}

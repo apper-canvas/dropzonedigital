@@ -57,7 +57,7 @@ const DropZone = ({ onFilesAdded, disabled = false }) => {
     let errorCount = 0;
 
     for (const file of files) {
-      const validation = uploadService.validateFile(file);
+const validation = uploadService.validateFile(file);
       
       if (!validation.valid) {
         toast.error(`${file.name}: ${validation.error}`);
@@ -68,16 +68,16 @@ const DropZone = ({ onFilesAdded, disabled = false }) => {
       const preview = await uploadService.generatePreview(file);
       
       const uploadFile = {
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        status: "pending",
-        progress: 0,
-        preview,
+        Id: Date.now(),
+        name_c: file.name,
+        size_c: file.size,
+        type_c: file.type,
+        status_c: "pending",
+        progress_c: 0,
+        preview_c: preview,
         file, // Keep reference to original file for upload
-        uploadedAt: null,
-        errorMessage: null
+        uploadedAt_c: null,
+        errorMessage_c: null
       };
 
       validFiles.push(uploadFile);

@@ -1,10 +1,11 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import DropZone from "@/components/organisms/DropZone";
-import FileQueue from "@/components/organisms/FileQueue";
 import { uploadService } from "@/services/api/uploadService";
+import { useAuth } from "@/layouts/Root";
 import ApperIcon from "@/components/ApperIcon";
+import FileQueue from "@/components/organisms/FileQueue";
+import DropZone from "@/components/organisms/DropZone";
 
 const Home = () => {
   const [files, setFiles] = useState([]);
@@ -23,9 +24,9 @@ const Home = () => {
     toast.info("All files cleared from queue");
   }, []);
 
-  const handleCancelUpload = useCallback((fileId) => {
+const handleCancelUpload = useCallback((fileId) => {
     setFiles(prev => prev.map(f => 
-      f.id === fileId ? { ...f, status: "pending", progress: 0 } : f
+      f.id === fileId ? { ...f, status_c: "pending", progress_c: 0 } : f
     ));
     toast.info("Upload cancelled");
   }, []);
@@ -34,13 +35,13 @@ const Home = () => {
     try {
       // Update status to uploading
       setFiles(prev => prev.map(f => 
-        f.id === file.id ? { ...f, status: "uploading", progress: 0 } : f
+        f.id === file.id ? { ...f, status_c: "uploading", progress_c: 0 } : f
       ));
 
       // Simulate upload with progress
       const result = await uploadService.uploadFile(file.file, (progress) => {
         setFiles(prev => prev.map(f => 
-          f.id === file.id ? { ...f, progress } : f
+          f.id === file.id ? { ...f, progress_c: progress } : f
         ));
       });
 
@@ -48,14 +49,14 @@ const Home = () => {
       setFiles(prev => prev.map(f => 
         f.id === file.id ? { 
           ...f, 
-          status: "success", 
-          progress: 100,
-          uploadedAt: result.uploadedAt,
-          url: result.url
+          status_c: "success", 
+          progress_c: 100,
+          uploadedAt_c: result.uploadedAt_c,
+          url_c: result.url_c
         } : f
       ));
 
-      toast.success(`${file.name} uploaded successfully!`);
+      toast.success(`${file.name_c} uploaded successfully!`);
     } catch (error) {
       console.error("Upload error:", error);
       
@@ -63,17 +64,17 @@ const Home = () => {
       setFiles(prev => prev.map(f => 
         f.id === file.id ? { 
           ...f, 
-          status: "error", 
-          errorMessage: error.message 
+          status_c: "error", 
+          errorMessage_c: error.message 
         } : f
       ));
 
-      toast.error(`Failed to upload ${file.name}: ${error.message}`);
+      toast.error(`Failed to upload ${file.name_c}: ${error.message}`);
     }
   }, []);
 
   const handleUploadAll = useCallback(async () => {
-    const pendingFiles = files.filter(f => f.status === "pending");
+    const pendingFiles = files.filter(f => f.status_c === "pending");
     
     if (pendingFiles.length === 0) {
       toast.warning("No files to upload");
@@ -98,8 +99,34 @@ const Home = () => {
   }, [files, uploadFile]);
 
   const totalFiles = files.length;
-  const completedFiles = files.filter(f => f.status === "success").length;
-  const failedFiles = files.filter(f => f.status === "error").length;
+const handleUploadAll = useCallback(async () => {
+    const pendingFiles = files.filter(f => f.status_c === "pending");
+    
+    if (pendingFiles.length === 0) {
+      toast.warning("No files to upload");
+      return;
+    }
+
+    setIsUploading(true);
+    
+    try {
+      // Upload files sequentially to avoid overwhelming the system
+      for (const file of pendingFiles) {
+        await uploadFile(file);
+      }
+      
+      toast.success(`Successfully uploaded ${pendingFiles.length} file${pendingFiles.length > 1 ? "s" : ""}!`);
+    } catch (error) {
+      console.error("Batch upload error:", error);
+      toast.error("Some files failed to upload");
+    } finally {
+      setIsUploading(false);
+    }
+  }, [files, uploadFile]);
+
+const completedFiles = files.filter(f => f.status_c === "success").length;
+  const failedFiles = files.filter(f => f.status_c === "error").length;
+  const { logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50">
@@ -150,8 +177,17 @@ const Home = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-8"
+className="mb-8"
         >
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">DropZone</h1>
+            <button
+              onClick={logout}
+              className="px-4 py-2 bg-error text-white rounded-lg hover:bg-error/90 transition-colors font-medium text-sm"
+            >
+              Logout
+            </button>
+          </div>
           <DropZone 
             onFilesAdded={handleFilesAdded}
             disabled={isUploading}
@@ -160,8 +196,7 @@ const Home = () => {
 
         {/* File Queue */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
           <FileQueue

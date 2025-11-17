@@ -1,8 +1,16 @@
 import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { getRouteConfig } from "./route.utils";
 
-// Lazy load components
+// Lazy load all page components
+const Root = lazy(() => import("@/layouts/Root"));
 const Home = lazy(() => import("@/components/pages/Home"));
+const Login = lazy(() => import("@/components/pages/Login"));
+const Signup = lazy(() => import("@/components/pages/Signup"));
+const Callback = lazy(() => import("@/components/pages/Callback"));
+const ErrorPage = lazy(() => import("@/components/pages/ErrorPage"));
+const ResetPassword = lazy(() => import("@/components/pages/ResetPassword"));
+const PromptPassword = lazy(() => import("@/components/pages/PromptPassword"));
 const NotFound = lazy(() => import("@/components/pages/NotFound"));
 
 // Loading component for suspense
@@ -23,32 +31,80 @@ const SuspenseWrapper = ({ children }) => (
   </Suspense>
 );
 
-// Main routes configuration
-const mainRoutes = [
-  {
-    path: "",
-    index: true,
-    element: (
-      <SuspenseWrapper>
-        <Home />
-      </SuspenseWrapper>
-    ),
-  },
-  {
-    path: "*",
-    element: (
-      <SuspenseWrapper>
-        <NotFound />
-      </SuspenseWrapper>
-    ),
-  },
-];
+// Helper to create routes with suspense and access config
+const createRoute = ({
+  path,
+  index,
+  element,
+  access,
+  children,
+  ...meta
+}) => {
+  let configPath;
+  if (index) {
+    configPath = "/";
+  } else {
+    configPath = path.startsWith('/') ? path : `/${path}`;
+  }
 
-// Routes array
+  const config = getRouteConfig(configPath);
+  const finalAccess = access || config?.allow;
+
+  const route = {
+    ...(index ? { index: true } : { path }),
+    element: element ? <SuspenseWrapper>{element}</SuspenseWrapper> : element,
+    handle: {
+      access: finalAccess,
+      ...meta,
+    },
+  };
+
+  if (children && children.length > 0) {
+    route.children = children;
+  }
+
+  return route;
+};
+
+// Routes configuration
 const routes = [
   {
     path: "/",
-    children: [...mainRoutes],
+    element: <SuspenseWrapper><Root /></SuspenseWrapper>,
+    children: [
+      createRoute({
+        index: true,
+        element: <Home />,
+      }),
+      createRoute({
+        path: "login",
+        element: <Login />,
+      }),
+      createRoute({
+        path: "signup",
+        element: <Signup />,
+      }),
+      createRoute({
+        path: "callback",
+        element: <Callback />,
+      }),
+      createRoute({
+        path: "error",
+        element: <ErrorPage />,
+      }),
+      createRoute({
+        path: "reset-password/:appId/:fields",
+        element: <ResetPassword />,
+      }),
+      createRoute({
+        path: "prompt-password/:appId/:emailAddress/:provider",
+        element: <PromptPassword />,
+      }),
+      createRoute({
+        path: "*",
+        element: <NotFound />,
+      }),
+    ],
   },
 ];
 
